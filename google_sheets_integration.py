@@ -1,29 +1,25 @@
 import os
-import gspread
 import json
-import re
-from datetime import datetime
 from google.oauth2.service_account import Credentials
-from dotenv import load_dotenv  # Import dotenv library
+import gspread
 
-# Load environment variables from .env file
-load_dotenv()
-
-# Scopes for Google Sheets API
+# SCOPES for Google Sheets API
 SCOPES = [
     'https://www.googleapis.com/auth/spreadsheets',
     'https://www.googleapis.com/auth/drive'
 ]
 
-# Authenticate using the credentials
+# Authenticate using the credentials from the environment variable
 try:
-    credentials = Credentials.from_service_account_info(
-        json.loads(os.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON")), 
-        scopes=SCOPES
-    )
+    raw_credentials = os.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON")
+    credentials = Credentials.from_service_account_info(json.loads(raw_credentials), scopes=SCOPES)
     client = gspread.authorize(credentials)
 except Exception as e:
     raise ValueError(f"Failed to authenticate with Google API: {e}")
+
+# Example: Your spreadsheet logic goes here
+print("Google Sheets API authenticated successfully!")
+
 
 # Replace with your spreadsheet ID
 SPREADSHEET_ID = '1v9U7LvKVqFmB1YM-4sIbEzwf70zPbGWLJUchNn1fLwE'
