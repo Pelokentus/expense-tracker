@@ -11,7 +11,15 @@ SCOPES = [
 ]
 
 # Authenticate
-credentials = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+import os
+import json
+from google.oauth2.service_account import Credentials
+
+# Use credentials from the environment variable
+credentials_json = os.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON")
+if not credentials_json:
+    raise ValueError("Google credentials not found in environment variables.")
+credentials = Credentials.from_service_account_info(json.loads(credentials_json), scopes=SCOPES)
 client = gspread.authorize(credentials)
 
 # Replace with your spreadsheet ID
