@@ -1,26 +1,29 @@
+import os
 import gspread
-from google.oauth2.service_account import Credentials
+import json
 import re
 from datetime import datetime
+from google.oauth2.service_account import Credentials
+from dotenv import load_dotenv  # Import dotenv library
 
-# Replace with the path to your JSON key
-SERVICE_ACCOUNT_FILE = 'G:/My Drive/ExpenseTracker/service-account-key.json'
+# Load environment variables from .env file
+load_dotenv()
+
+# Scopes for Google Sheets API
 SCOPES = [
     'https://www.googleapis.com/auth/spreadsheets',
     'https://www.googleapis.com/auth/drive'
 ]
 
-# Authenticate
-import os
-import json
-from google.oauth2.service_account import Credentials
-
-# Use credentials from the environment variable
-credentials_json = os.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON")
-if not credentials_json:
-    raise ValueError("Google credentials not found in environment variables.")
-credentials = Credentials.from_service_account_info(json.loads(credentials_json), scopes=SCOPES)
-client = gspread.authorize(credentials)
+# Authenticate using the credentials
+try:
+    credentials = Credentials.from_service_account_info(
+        json.loads(os.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON")), 
+        scopes=SCOPES
+    )
+    client = gspread.authorize(credentials)
+except Exception as e:
+    raise ValueError(f"Failed to authenticate with Google API: {e}")
 
 # Replace with your spreadsheet ID
 SPREADSHEET_ID = '1v9U7LvKVqFmB1YM-4sIbEzwf70zPbGWLJUchNn1fLwE'
@@ -90,7 +93,7 @@ def insert_expense(date, amount, description, payment_type):
         row_data[18] = description  # Column S
 
         # Update the row in the sheet
-        sheet.update(range_name=f"A{next_row}:S{next_row}", values=[row_data])
+        sheet.update(f"A{next_row}:S{next_row}", [row_data])
         print(f"Data inserted successfully in row {next_row}!")
     except Exception as e:
         print(f"Error: {e}")
