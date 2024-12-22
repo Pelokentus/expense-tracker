@@ -2,6 +2,10 @@ import os
 import json
 from google.oauth2.service_account import Credentials
 import gspread
+from dotenv import load_dotenv  # Ensures the .env file is loaded
+
+# Load the .env file
+load_dotenv()
 
 # SCOPES for Google Sheets API
 SCOPES = [
@@ -9,20 +13,26 @@ SCOPES = [
     'https://www.googleapis.com/auth/drive'
 ]
 
-# Authenticate using the credentials from the environment variable
+# Authenticate using the environment variable
 try:
-    raw_credentials = os.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON")
-    credentials = Credentials.from_service_account_info(json.loads(raw_credentials), scopes=SCOPES)
+    credentials_json = os.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON")
+    if not credentials_json:
+        raise ValueError("GOOGLE_APPLICATION_CREDENTIALS_JSON is not set or is empty.")
+
+    credentials = Credentials.from_service_account_info(
+        json.loads(credentials_json),
+        scopes=SCOPES
+    )
     client = gspread.authorize(credentials)
 except Exception as e:
     raise ValueError(f"Failed to authenticate with Google API: {e}")
 
 # Example: Your spreadsheet logic goes here
+SPREADSHEET_ID = '1v9U7LvKVqFmB1YM-4sIbEzwf70zPbGWLJUchNn1fLwE'
+
+# Placeholder for future spreadsheet operations
 print("Google Sheets API authenticated successfully!")
 
-
-# Replace with your spreadsheet ID
-SPREADSHEET_ID = '1v9U7LvKVqFmB1YM-4sIbEzwf70zPbGWLJUchNn1fLwE'
 
 # Keywords for categorizing expenses
 CATEGORY_KEYWORDS = {
